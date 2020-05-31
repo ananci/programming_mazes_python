@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from mazes import grid
 import random
@@ -12,14 +12,12 @@ class BinaryTree(object):
                 neighbors.append(cell.north)
             if cell.east:
                 neighbors.append(cell.east)
-            #print(neighbors)
-            #continue
             if neighbors:
                 neighbor = random.choice(neighbors)
                 cell.link(neighbor)
 
 
-binary_maze = grid.Grid(4, 4)
+binary_maze = grid.Grid(10, 10)
 BinaryTree().on(binary_maze)
 print(binary_maze)
 
