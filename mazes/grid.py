@@ -37,6 +37,9 @@ class Cell(object):
         ls.append(self.west)
         return ls
 
+    def __str__(self):
+        print('{}:{}:{}:{}'.format(self.north, self.east, self.south, self.west))
+
 
 class Grid(object):
 
@@ -83,7 +86,26 @@ class Grid(object):
 
     def each_cell(self):
         for row in self.grid:
-            for col in row:
-                for cell in col:
+            for cell in row:
                     yield cell
 
+    def __str__(self):
+        output = "+" + "---+"*self.columns + "\n"
+        for row in self.each_row():
+            top = "|"
+            bottom = "+"
+            for cell in row:
+                body = '   '
+                east_boundary = ' ' if cell.linked(cell.east) else '|'
+                top += body
+                top += east_boundary
+
+                south_boundary = '   ' if cell.linked(cell.south) else '---'
+                corner = '+'
+                bottom += south_boundary
+                bottom += corner
+            output += top
+            output += '\n'
+            output += bottom
+            output += '\n'
+        return output
