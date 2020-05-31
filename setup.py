@@ -13,5 +13,5 @@ setup(
     license='LICENSE',
     description='Implementation of mazes code from Programming Mazes book',
     long_description=open('README.md').read(),
-    install_requires=[],
+    install_requires=['cairosvg'],
 )
