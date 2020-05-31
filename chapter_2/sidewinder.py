@@ -30,3 +30,4 @@ class Sidewinder(object):
 sidewinder_maze = grid.Grid(10, 10)
 Sidewinder().on(sidewinder_maze)
 print(sidewinder_maze)
+sidewinder_maze.write_png('sidewinder.png')

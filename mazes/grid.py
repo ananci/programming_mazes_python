@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+from cairosvg import svg2png
 
 class Cell(object):
 
@@ -109,3 +110,53 @@ class Grid(object):
             output += bottom
             output += '\n'
         return output
+    
+    def write_png(self, filename):
+
+        aspect_ratio = self.rows / self.columns
+        # Pad the maze all around
+        padding = 10
+        # Height and width of the maze image (excluding padding), in pixels
+        height = 500
+        width = int(height * aspect_ratio)
+
+        # Scaling factors mapping maze coordinates to image coordinates
+        scy, scx = height / self.columns, width / self.rows
+
+        def write_wall(x1, y1, x2, y2):
+            """Write a single wall to the SVG image file handle f."""
+
+            return '<line x1="{}" y1="{}" x2="{}" y2="{}"/>'.format(x1, y1, x2, y2)
+
+        # Write the SVG image file for maze
+        svg_data = ''
+        # SVG preamble and styles.
+        svg_data += '<?xml version="1.0" encoding="utf-8"?>'
+        svg_data += '<svg xmlns="http://www.w3.org/2000/svg"'
+        svg_data += '    xmlns:xlink="http://www.w3.org/1999/xlink"'
+        svg_data += '    width="{:d}" height="{:d}" viewBox="{} {} {} {}">'.format(width+2*padding, height+2*padding, -padding, -padding, width+2*padding, height+2*padding)
+        svg_data += '<defs>\n<style type="text/css"><![CDATA['
+        svg_data += 'line {'
+        svg_data += '    stroke: #000000;\n    stroke-linecap: square;'
+        svg_data += '    stroke-width: 5;\n}'
+        svg_data += ']]></style>\n</defs>'
+        # Draw the "South" and "East" walls of each cell, if present (these
+        # are the "North" and "West" walls of a neighbouring cell in
+        # general, of course).
+        for row in self.each_row():
+            for cell in row:
+                x, y = cell.row, cell.column
+                if bool(cell.south):
+                    x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
+                    svg_data += write_wall(x1, y1, x2, y2)
+                if bool(cell.east):
+                    x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
+                    svg_data += write_wall(x1, y1, x2, y2)
+        # Draw the North and West maze border, which won't have been drawn
+        # by the procedure above. 
+        svg_data += '<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width)
+        svg_data += '<line x1="0" y1="0" x2="0" y2="{}"/>'.format(height)
+        svg_data += '</svg>'
+
+        svg2png(bytestring=svg_data,write_to=filename)
+
