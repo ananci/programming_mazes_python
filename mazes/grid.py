@@ -140,18 +140,25 @@ class Grid(object):
         svg_data += '    stroke: #000000;\n    stroke-linecap: square;'
         svg_data += '    stroke-width: 5;\n}'
         svg_data += ']]></style>\n</defs>'
+        svg_data += '<rect width="100%" height="100%" fill="#878787"/>'
         # Draw the "South" and "East" walls of each cell, if present (these
         # are the "North" and "West" walls of a neighbouring cell in
         # general, of course).
         for row in self.each_row():
             for cell in row:
                 x, y = cell.row, cell.column
-                if bool(cell.south):
+                print('{},{}'.format(x, y))
+                east_boundary = ' ' if cell.linked(cell.east) else '|'
+                south_boundary = '   ' if cell.linked(cell.south) else '---'
+
+                if south_boundary:
                     x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
                     svg_data += write_wall(x1, y1, x2, y2)
-                if bool(cell.east):
+                    print('{},{},{},{}'.format(x1, y1, x2, y2))
+                if east_boundary:
                     x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
                     svg_data += write_wall(x1, y1, x2, y2)
+                    print('{},{},{},{}'.format(x1, y1, x2, y2))
         # Draw the North and West maze border, which won't have been drawn
         # by the procedure above. 
         svg_data += '<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width)
