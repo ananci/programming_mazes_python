@@ -27,7 +27,7 @@ class Sidewinder(object):
                         cell.link(cell.east)
 
 
-sidewinder_maze = grid.Grid(10, 10)
+sidewinder_maze = grid.Grid(30, 30)
 Sidewinder().on(sidewinder_maze)
 print(sidewinder_maze)
 sidewinder_maze.write_png('sidewinder.png')

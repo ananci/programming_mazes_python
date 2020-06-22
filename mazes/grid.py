@@ -110,12 +110,12 @@ class Grid(object):
             output += bottom
             output += '\n'
         return output
-    
+
     def write_png(self, filename):
 
         aspect_ratio = self.rows / self.columns
         # Pad the maze all around
-        padding = 10
+        padding = 0
         # Height and width of the maze image (excluding padding), in pixels
         height = 500
         width = int(height * aspect_ratio)
@@ -126,7 +126,7 @@ class Grid(object):
         def write_wall(x1, y1, x2, y2):
             """Write a single wall to the SVG image file handle f."""
 
-            return '<line x1="{}" y1="{}" x2="{}" y2="{}"/>'.format(x1, y1, x2, y2)
+            return '<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"/>'.format(x1=x1, y1=y1, x2=x2, y2=y2)
 
         # Write the SVG image file for maze
         svg_data = ''
@@ -146,24 +146,19 @@ class Grid(object):
         # general, of course).
         for row in self.each_row():
             for cell in row:
-                x, y = cell.row, cell.column
-                print('{},{}'.format(x, y))
+                x, y = cell.column, cell.row
                 east_boundary = ' ' if cell.linked(cell.east) else '|'
                 south_boundary = '   ' if cell.linked(cell.south) else '---'
-
-                if south_boundary:
+                if not cell.linked(cell.south):
                     x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
                     svg_data += write_wall(x1, y1, x2, y2)
-                    print('{},{},{},{}'.format(x1, y1, x2, y2))
-                if east_boundary:
+                if not cell.linked(cell.east):
                     x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
                     svg_data += write_wall(x1, y1, x2, y2)
-                    print('{},{},{},{}'.format(x1, y1, x2, y2))
         # Draw the North and West maze border, which won't have been drawn
-        # by the procedure above. 
+        # by the procedure above.
         svg_data += '<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width)
         svg_data += '<line x1="0" y1="0" x2="0" y2="{}"/>'.format(height)
         svg_data += '</svg>'
 
         svg2png(bytestring=svg_data,write_to=filename)
-

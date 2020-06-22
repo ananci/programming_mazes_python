@@ -20,4 +20,4 @@ class BinaryTree(object):
 binary_maze = grid.Grid(10, 10)
 BinaryTree().on(binary_maze)
 print(binary_maze)
-
+binary_maze.write_png('binary.png')
