@@ -156,8 +156,6 @@ class Grid(object):
     for row in self.each_row():
       for cell in row:
         x, y = cell.column, cell.row
-        east_boundary = ' ' if cell.linked(cell.east) else '|'
-        south_boundary = '   ' if cell.linked(cell.south) else '---'
         if not cell.linked(cell.south):
           x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
           svg_data += write_wall(x1, y1, x2, y2)
