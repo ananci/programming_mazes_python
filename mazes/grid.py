@@ -3,6 +3,12 @@
 import random
 from cairosvg import svg2png
 
+def write_svg_wall(x1, y1, x2, y2):
+  """Write a single wall to the SVG image file handle f."""
+
+  return '<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"/>'.format(
+    x1=x1, y1=y1, x2=x2, y2=y2)
+
 class Cell(object):
 
   def __init__(self, row, column):
@@ -42,6 +48,25 @@ class Cell(object):
     print('{}:{}:{}:{}'.format(
       self.north, self.east, self.south, self.west))
 
+  def to_svg_list(self, scx, scy):
+    """Generate a list of SVG strings creating lines.
+
+    Args:
+      scx: (INT) Scaling factor for x values
+      scy: (INT) Scaling factor for y values
+
+    Returns:
+        List of strings
+    """
+    svg_list = []
+    x, y = self.column, self.row
+    if not self.linked(self.south):
+      x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
+      svg_list.append(write_svg_wall(x1, y1, x2, y2))
+    if not self.linked(self.east):
+      x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
+      svg_list.append(write_svg_wall(x1, y1, x2, y2))
+    return svg_list
 
 class Grid(object):
 
@@ -124,12 +149,6 @@ class Grid(object):
     # Scaling factors mapping maze coordinates to image coordinates
     scy, scx = height / self.columns, width / self.rows
 
-    def write_wall(x1, y1, x2, y2):
-      """Write a single wall to the SVG image file handle f."""
-
-      return '<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"/>'.format(
-        x1=x1, y1=y1, x2=x2, y2=y2)
-
     # Write the SVG image file for maze
     svg_data = ''
     # SVG preamble and styles.
@@ -153,15 +172,14 @@ class Grid(object):
     # Draw the "South" and "East" walls of each cell, if present (these
     # are the "North" and "West" walls of a neighbouring cell in
     # general, of course).
-    for row in self.each_row():
-      for cell in row:
-        x, y = cell.column, cell.row
-        if not cell.linked(cell.south):
-          x1, y1, x2, y2 = x*scx, (y+1)*scy, (x+1)*scx, (y+1)*scy
-          svg_data += write_wall(x1, y1, x2, y2)
-        if not cell.linked(cell.east):
-          x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
-          svg_data += write_wall(x1, y1, x2, y2)
+    svg_set = {wall for row in self.each_row()
+                      for cell in row
+                        for wall in cell.to_svg_list(scx=scx, scy=scy)}
+    #for row in self.each_row():
+    #  for cell in row:
+    #    svg_list = cell.to_svg_list(scx=scx, scy=scy)
+    #    svg_data += "\n".join(svg_list)
+    svg_data += "\n".join(svg_set)
     # Draw the North and West maze border, which won't have been drawn
     # by the procedure above.
     svg_data += '<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width)
