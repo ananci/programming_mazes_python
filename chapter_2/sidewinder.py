@@ -5,29 +5,29 @@ import random
 
 class Sidewinder(object):
 
-    def on(self, grid):
-        for row in grid.each_row():
-            run = []
+  def on(self, grid):
+    for row in grid.each_row():
+      run = []
 
-            for cell in row:
-                run.append(cell)
+      for cell in row:
+        run.append(cell)
 
-                at_eastern_boundary = not bool(cell.east)
-                at_northern_boundary = not bool(cell.north)
+        at_eastern_boundary = not bool(cell.east)
+        at_northern_boundary = not bool(cell.north)
 
-                should_close_out = at_eastern_boundary or (not at_northern_boundary and random.randint(0, 1) == 0)
+        should_close_out = at_eastern_boundary or (not at_northern_boundary and random.randint(0, 1) == 0)
 
-                if should_close_out:
-                    member = random.choice(run)
-                    if member.north:
-                        member.link(member.north)
-                    run = []
-                else:
-                    if cell.east:
-                        cell.link(cell.east)
+        if should_close_out:
+          member = random.choice(run)
+          if member.north:
+            member.link(member.north)
+          run = []
+        else:
+          if cell.east:
+            cell.link(cell.east)
 
 
-sidewinder_maze = grid.Grid(10, 10)
+sidewinder_maze = grid.Grid(30, 30)
 Sidewinder().on(sidewinder_maze)
 print(sidewinder_maze)
 sidewinder_maze.write_png('sidewinder.png')

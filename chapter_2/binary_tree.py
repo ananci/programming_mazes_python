@@ -5,19 +5,18 @@ import random
 
 class BinaryTree(object):
 
-    def on(self, grid):
-        for cell in grid.each_cell():
-            neighbors = []
-            if cell.north:
-                neighbors.append(cell.north)
-            if cell.east:
-                neighbors.append(cell.east)
-            if neighbors:
-                neighbor = random.choice(neighbors)
-                cell.link(neighbor)
+  def on(self, grid):
+    for cell in grid.each_cell():
+      neighbors = []
+      if cell.north:
+        neighbors.append(cell.north)
+      if cell.east:
+        neighbors.append(cell.east)
+      if neighbors:
+        neighbor = random.choice(neighbors)
+      cell.link(neighbor)
 
-
-binary_maze = grid.Grid(10, 10)
+binary_maze = grid.Grid(30, 30)
 BinaryTree().on(binary_maze)
 print(binary_maze)
-
+binary_maze.write_png('binary.png')
