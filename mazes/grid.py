@@ -66,6 +66,12 @@ class Cell(object):
     if not self.linked(self.east):
       x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
       svg_list.append(write_svg_wall(x1, y1, x2, y2))
+    if not self.linked(self.north):
+      x1, y1, x2, y2 = x*scx, y*scy, (x+1)*scx, y*scy
+      svg_list.append(write_svg_wall(x1, y1, x2, y2))
+    if not self.linked(self.west):
+      x1, y1, x2, y2 = x*scx, y*scy, x*scx, (y+1)*scy
+      svg_list.append(write_svg_wall(x1, y1, x2, y2))
     return svg_list
 
 class Grid(object):
@@ -138,7 +144,9 @@ class Grid(object):
     return output
 
   def write_png(self, filename):
+      svg2png(bytestring=self.generate_svg_data(), write_to=filename)
 
+  def generate_svg_data(self):
     aspect_ratio = self.rows / self.columns
     # Pad the maze all around
     padding = 0
@@ -169,21 +177,11 @@ class Grid(object):
     svg_data += '  stroke-width: 5;\n}'
     svg_data += ']]></style>\n</defs>'
     svg_data += '<rect width="100%" height="100%" fill="#878787"/>'
-    # Draw the "South" and "East" walls of each cell, if present (these
-    # are the "North" and "West" walls of a neighbouring cell in
-    # general, of course).
+    # Generate the SVG strings representing lines for each cell.
+    # Using a set here as this will prevent duplicate lines.
     svg_set = {wall for row in self.each_row()
                       for cell in row
                         for wall in cell.to_svg_list(scx=scx, scy=scy)}
-    #for row in self.each_row():
-    #  for cell in row:
-    #    svg_list = cell.to_svg_list(scx=scx, scy=scy)
-    #    svg_data += "\n".join(svg_list)
     svg_data += "\n".join(svg_set)
-    # Draw the North and West maze border, which won't have been drawn
-    # by the procedure above.
-    svg_data += '<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width)
-    svg_data += '<line x1="0" y1="0" x2="0" y2="{}"/>'.format(height)
     svg_data += '</svg>'
-
-    svg2png(bytestring=svg_data,write_to=filename)
+    return svg_data
