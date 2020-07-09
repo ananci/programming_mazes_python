@@ -146,6 +146,10 @@ class Grid(object):
   def write_png(self, filename):
       svg2png(bytestring=self.generate_svg_data(), write_to=filename)
 
+  def write_svg(self, filename):
+      with open(filename, 'w') as f:
+          f.write(self.generate_svg_data())
+
   def generate_svg_data(self):
     aspect_ratio = self.rows / self.columns
     # Pad the maze all around
