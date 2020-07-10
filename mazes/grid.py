@@ -9,7 +9,7 @@ def write_svg_wall(x1, y1, x2, y2):
   return '<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}"/>'.format(
     x1=x1, y1=y1, x2=x2, y2=y2)
 
-class Cell(object):
+class _Cell(object):
 
   def __init__(self, row, column):
     self.row = row
@@ -75,23 +75,26 @@ class Grid(object):
   def __init__(self, rows, columns):
     self.rows = rows
     self.columns = columns
-    self.grid, self._flat_grid = self._prepare_grid()
+    self.grid = self._prepare_grid()
     self._configure_cells()
+
+  def _flat_grid(self):
+      for row in self.grid:
+          for cell in row:
+              yield cell
 
   def _prepare_grid(self):
     grid = []
-    flat_grid = []
     for row in range(self.rows):
       temp_ls = []
       grid.append(temp_ls)
       for col in range(self.columns):
-        cell = Cell(row=row, column=col)
+        cell = _Cell(row=row, column=col)
         temp_ls.append(cell)
-        flat_grid.append(cell)
-    return grid, flat_grid
+    return grid
 
   def _configure_cells(self):
-    for cell in self._flat_grid:
+    for cell in self._flat_grid():
       row, col = cell.row, cell.column
       cell.north = self.access(row - 1, col)
       cell.south = self.access(row + 1, col)
@@ -104,19 +107,18 @@ class Grid(object):
     return None
 
   def random_cell(self):
-    return random.choice(self.flat_grid)
+    return random.choice(self.flat_grid())
 
   def size(self):
-    return len(self.flat_grid)
+    return len(self.flat_grid())
 
   def each_row(self):
     for row in self.grid:
       yield row
 
   def each_cell(self):
-    for row in self.grid:
-      for cell in row:
-          yield cell
+    for cell in self._flat_grid():
+        yield cell
 
   def __str__(self):
     """Generate an ASCII representation of the maze."""
