@@ -119,6 +119,7 @@ class Grid(object):
           yield cell
 
   def __str__(self):
+    """Generate an ASCII representation of the maze."""
     output = "+" + "---+"*self.columns + "\n"
     for row in self.each_row():
       top = "|"
@@ -128,7 +129,6 @@ class Grid(object):
         east_boundary = ' ' if cell.linked(cell.east) else '|'
         top += body
         top += east_boundary
-
         south_boundary = '   ' if cell.linked(cell.south) else '---'
         corner = '+'
         bottom += south_boundary
@@ -140,13 +140,16 @@ class Grid(object):
     return output
 
   def write_png(self, filename):
-      svg2png(bytestring=self.generate_svg_data(), write_to=filename)
+      """Write the maze to a PNG file."""
+      svg2png(bytestring=self._generate_svg_data(), write_to=filename)
 
   def write_svg(self, filename):
-      with open(filename, 'w') as f:
-          f.write(self.generate_svg_data())
+    """Write the maze to a SVG file."""
+    with open(filename, 'w') as f:
+      f.write(self._generate_svg_data())
 
-  def generate_svg_data(self):
+  def _generate_svg_data(self):
+    """Transform the maze into it's SVG representation."""
     aspect_ratio = self.rows / self.columns
     # Pad the maze all around
     padding = 0
@@ -179,9 +182,8 @@ class Grid(object):
     svg_data += '<rect width="100%" height="100%" fill="#878787"/>'
     # Generate the SVG strings representing lines for each cell.
     # Using a set here as this will prevent duplicate lines.
-    svg_set = {wall for row in self.each_row()
-                      for cell in row
-                        for wall in cell.to_svg_list(scx=scx, scy=scy)}
+    svg_set = {wall for cell in self.each_cell()
+                  for wall in cell.to_svg_list(scx=scx, scy=scy)}
     svg_data += "\n".join(svg_set)
     svg_data += '</svg>'
     return svg_data
