@@ -44,10 +44,6 @@ class Cell(object):
     ls.append(self.west)
     return ls
 
-  def __str__(self):
-    print('{}:{}:{}:{}'.format(
-      self.north, self.east, self.south, self.west))
-
   def to_svg_list(self, scx, scy):
     """Generate a list of SVG strings creating lines.
 
